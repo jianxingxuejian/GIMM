@@ -1,0 +1,53 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    needs: [check-backend, check-fontend]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Pnpm setup
+        uses: pnpm/action-setup@v2
+        with:
+          version: 7
+
+      - name: Node.js setup
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      - name: Rust setup
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build and release the app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: Upload build
+        uses: actions/upload-artifact@v3
+        with:
+          name: GIMM
+          path: src-tauri/target/release/bundle/msi/*.msi

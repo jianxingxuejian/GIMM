@@ -1,0 +1,47 @@
+name: Check Frontend
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'src-tauri/**'
+      - '**.md'
+      - '.github/workflows/check-backend.yml'
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - 'src-tauri/**'
+      - '**.md'
+      - '.github/workflows/check-backend.yml'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    id: check-fontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Pnpm setup
+        uses: pnpm/action-setup@v2
+        with:
+          version: 7
+
+      - name: Node.js setup
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: TypeCheck
+        run: pnpm run check
+
+    continue-on-error: ${{ false }}

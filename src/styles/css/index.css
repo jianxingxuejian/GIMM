@@ -1,0 +1,9 @@
+@import './common.css';
+@import './reset.css';
+
+html,
+body,
+#app {
+  /* scrollbar-gutter: stable; */
+  overflow-y: overlay;
+}
