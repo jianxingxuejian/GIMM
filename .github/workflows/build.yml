@@ -3,17 +3,13 @@ name: Build
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - '**.md'
   pull_request:
     branches: [main]
-    paths-ignore:
-      - '**.md'
 
   workflow_dispatch:
 
 jobs:
-  common:
+  build:
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -38,30 +34,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-  check-frontend:
-    runs-on: windows-latest
-    needs: common
-    if: startsWith(github.event.head_commit.modified, 'src-tauri/') == false
-    steps:
-      - name: Lint
-        run: pnpm run lint
-
-      - name: TypeCheck
-        run: pnpm run check
-
-  check-backend:
-    runs-on: windows-latest
-    needs: common
-    if: startsWith(github.event.head_commit.modified, 'src-tauri/') == true
-    steps:
-      - name: Format check
-        run: cd src-tauri && cargo fmt -- --check
-
-  build:
-    runs-on: windows-latest
-    needs: [check-frontend, check-backend]
-    if: needs.check-backend.result == 'success' && needs.check-frontend.result == 'success'
-    steps:
       - name: Build and release the app
         uses: tauri-apps/tauri-action@v0
         env:

@@ -1,0 +1,28 @@
+name: Check Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src-tauri/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src-tauri/**'
+
+  workflow_dispatch:
+
+jobs:
+  check-backend:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Rust setup
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Format check
+        run: cd src-tauri && cargo fmt -- --check
