@@ -1,1 +1,7 @@
-{}
+{
+  "route": {
+    "home": "Home",
+    "mod": "Mod",
+    "tools": "Utils"
+  }
+}

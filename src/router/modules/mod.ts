@@ -1,18 +1,18 @@
 const routes: Route.Config = {
-  path: '/home',
-  name: 'home',
-  redirect: '/home/index',
+  path: '/mod',
+  name: 'mod',
+  redirect: '/mod/index',
   component: () => import('@/layout/index.vue'),
   meta: {
-    sort: 1,
+    sort: 2,
     isRoot: true,
-    icon: 'mdi:home-outline',
+    icon: 'mdi:account-edit-outline',
   },
   children: [
     {
       path: 'index',
-      name: 'home_index',
-      component: () => import('@/views/home/index.vue'),
+      name: 'mod_index',
+      component: () => import('@/views/mod/index.vue'),
     },
   ],
 }
