@@ -42,6 +42,10 @@
       fontSizeMedium: '1rem',
       fontSizeLarge: '1.2rem',
     },
+    Menu: {
+      fontSize: '1.25rem',
+      itemHeight: '4rem',
+    },
   })
 
   function resizeFontSize() {

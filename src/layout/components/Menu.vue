@@ -1,10 +1,5 @@
 <template>
-  <n-menu
-    :value="activeKey"
-    :options="menus"
-    :collapsed-width="15"
-    @update:value="handleUpdateMenu"
-  />
+  <n-menu :value="activeKey" :options="menus" class="flex-col" @update:value="handleUpdateMenu" />
 </template>
 
 <script setup lang="ts">
@@ -20,23 +15,11 @@
     routes.forEach(route => {
       const { name } = route
       const label = t(`route.${name}`)
-      if (route.meta?.isRoot && route.children && route.children.length == 1) {
-        const child = route.children[0]
-        const menu: Route.Menu = {
-          key: child.name,
-          label,
-          icon: route.meta?.icon || child.meta?.icon,
-        }
-        menus.push(menu)
-      } else {
-        const menu: Route.Menu = {
-          key: route.name,
-          label,
-          icon: route.meta?.icon,
-          children: route.children && transformRouteToMenu(route.children),
-        }
-        menus.push(menu)
-      }
+      const icon = route.meta?.icon ?? route.children?.[0]?.meta?.icon
+      const isRoot = route.meta?.isRoot && route.children && route.children.length == 1
+      const children = isRoot ? undefined : route.children && transformRouteToMenu(route.children)
+      const key = isRoot ? route.children![0].name : route.name
+      menus.push({ key, label, icon, children })
     })
     return menus
   }
@@ -46,7 +29,18 @@
 
   const activeKey = computed(() => route.matched[1].name as string)
 
-  function handleUpdateMenu(key: string) {
-    router.push({ name: key })
-  }
+  const handleUpdateMenu = (key: string) => router.push({ name: key })
 </script>
+
+<style lang="scss" scoped>
+  :deep(.n-menu-item-content) {
+    padding: 0.5rem !important;
+  }
+
+  :deep(.n-menu-item-content__icon) {
+    width: auto !important;
+    font-size: 2rem !important;
+    margin-left: 0.5rem !important;
+    margin-right: 0.5rem !important;
+  }
+</style>
