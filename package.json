@@ -19,6 +19,7 @@
     "lodash-es": "^4.17.21",
     "pinia": "^2.0.31",
     "snarkdown": "^2.0.0",
+    "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store",
     "vue": "^3.2.47",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.1.6"

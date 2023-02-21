@@ -1,5 +1,10 @@
 interface Setting {
   locale: LocaleCode
+  mod: ModSettings
+}
+
+interface ModSettings {
+  path: string
 }
 
 type LocaleCode = 'en' | 'zh-CN'
