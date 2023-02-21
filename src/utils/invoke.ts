@@ -1,6 +1,7 @@
 import type { OpenDialogOptions } from '@tauri-apps/api/dialog'
 import { shell, dialog } from '@tauri-apps/api'
 import { invoke, convertFileSrc } from '@tauri-apps/api/tauri'
+import { CharacterEnum } from '@/views/mod/constant'
 
 export function select_dir<T extends OpenDialogOptions = OpenDialogOptions>(options?: T) {
   const { directory = true, multiple = false } = options || {}
@@ -42,9 +43,9 @@ function convertModBasic(contents: string, name: string) {
   const basic: ModBasic = JSON.parse(contents)
   const { modId } = basic
   if (!modId) {
-    Object.entries(characterDict).forEach(([k, v]) => {
+    Object.entries(CharacterEnum).forEach(([k]) => {
       if (name.toLocaleLowerCase().includes(k)) {
-        basic.modId = v
+        basic.name = k
         basic.type = 1
         return false
       }
