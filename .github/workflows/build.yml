@@ -15,7 +15,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    needs: [check-backend, check-fontend]
+    needs: [check-backend, check-frontend]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
