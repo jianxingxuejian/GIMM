@@ -40,6 +40,7 @@ jobs:
 
   check-frontend:
     runs-on: windows-latest
+    needs: common
     if: startsWith(github.event.head_commit.modified, 'src-tauri/') == false
     steps:
       - name: Lint
@@ -50,6 +51,7 @@ jobs:
 
   check-backend:
     runs-on: windows-latest
+    needs: common
     if: startsWith(github.event.head_commit.modified, 'src-tauri/') == true
     steps:
       - name: Format check
