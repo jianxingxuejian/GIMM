@@ -9,6 +9,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    EnhancedButton: typeof import('./../components/EnhancedButton.vue')['default']
     IconIcOutlineSettings: typeof import('~icons/ic/outline-settings')['default']
     NaiveProvider: typeof import('./../components/NaiveProvider.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
