@@ -48,7 +48,7 @@ export async function loadClientSetting() {
   try {
     await store.load()
     const locale = (await getSetting('locale')) as Setting['locale'] | null
-    const mod = (await getSetting('theme')) as Setting['mod'] | null
+    const mod = (await getSetting('mod')) as Setting['mod'] | null
 
     const settingStore = useSettingStore()
     settingStore.initSettings({
