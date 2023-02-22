@@ -5,6 +5,8 @@ import messages from '@intlify/unplugin-vue-i18n/messages'
 const i18n = createI18n({
   legacy: false,
   messages,
+  locale: 'en',
+  fallbackLocale: 'en',
 })
 
 /** setup i18n */
