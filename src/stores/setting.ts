@@ -31,6 +31,9 @@ export const useSettingStore = defineStore('setting-store', {
         }
       })
     },
+    updateLocale() {
+      setSetting('locale', this.locale)
+    },
     async updateModPath(path?: string) {
       if (path) {
         this.mod.path = path

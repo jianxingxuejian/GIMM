@@ -9,6 +9,7 @@ mod cmd;
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
             get_mod_list,
             rename,
