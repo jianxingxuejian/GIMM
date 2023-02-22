@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::OsStr;
 use std::fs;
@@ -13,18 +12,34 @@ use super::MyError;
 
 #[derive(Serialize, Deserialize)]
 pub struct ModInfo {
-    pub contents: String,
-    pub name: String,
-    pub local_img: Vec<String>,
+    info: Info,
+    author: Author,
+    tags: Vec<String>,
+    order: u16,
+    like: bool,
 }
 
-pub fn get_mod_list(path: String) -> HashMap<String, ModInfo> {
+#[derive(Serialize, Deserialize)]
+pub struct Info {
+    name: String,
+    urls: Vec<String>,
+    images: Vec<String>,
+    videos: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Author {
+    name: String,
+    urls: Vec<String>,
+}
+
+pub fn get_mod_list(path: String) -> Vec<ModInfo> {
+    let mut mod_list = Vec::new();
     let path = Path::new(&path);
     let ini = Some(OsStr::new("ini"));
     let merged = Some(OsStr::new("merged.ini"));
-    let mut map = HashMap::new();
     for entry in WalkDir::new(path) {
-        let result = || -> Option<(String, ModInfo)> {
+        let result = || -> Option<ModInfo> {
             let entry = entry.ok()?;
             let path = entry.path();
             if path.extension() != ini {
@@ -33,9 +48,9 @@ pub fn get_mod_list(path: String) -> HashMap<String, ModInfo> {
             if path.file_name() == merged {
                 let target = path.parent()?;
                 if is_deep_merge(target, ini) == Some(false) {
-                    return get_info(target, path);
+                    return None;
                 }
-                return None;
+                return get_info(target, path);
             }
             let target = path.parent()?.parent()?;
             let merged = target.join("merged.ini");
@@ -44,18 +59,15 @@ pub fn get_mod_list(path: String) -> HashMap<String, ModInfo> {
             }
             return get_info(target, path);
         };
-        match result() {
-            Some((path, mod_info)) => {
-                map.insert(path, mod_info);
-            }
-            None => continue,
+        if let Some(mod_info) = result() {
+            mod_list.push(mod_info);
         }
     }
-    map
+    mod_list
 }
 
-fn get_info(target: &Path, path: &Path) -> Option<(String, ModInfo)> {
-    let name = path.file_stem().unwrap().to_string_lossy().to_string();
+fn get_info(target: &Path, path: &Path) -> Option<ModInfo> {
+    let name = path.file_stem()?.to_string_lossy().to_string();
     let modinfo = target.join("modinfo.json");
     let contents = if modinfo.exists() {
         let mut file = File::open(&modinfo).ok()?;
@@ -70,15 +82,18 @@ fn get_info(target: &Path, path: &Path) -> Option<(String, ModInfo)> {
         file.write(contents.as_bytes()).ok();
         contents
     };
-    let local_img = read_local_img(&target).expect("Read local img fail");
-    return Some((
-        target.display().to_string(),
-        ModInfo {
-            contents,
-            name,
-            local_img,
-        },
-    ));
+    let info: Info = serde_json::from_str(&contents).ok()?;
+    let author = Author {
+        name: info.name,
+        urls: info.urls,
+    };
+    Some(ModInfo {
+        info,
+        author,
+        tags: vec![],
+        order: 0,
+        like: false,
+    })
 }
 
 fn is_deep_merge(path: &Path, ini: Option<&OsStr>) -> Option<bool> {

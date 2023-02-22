@@ -1,6 +1,6 @@
 <template>
   <div class="h-screen">
-    <div>
+    <div class="flex-center">
       <n-space>
         <enhanced-button @click="settingRef?.show">
           <icon-ic-outline-settings />
@@ -54,6 +54,7 @@
     modList.value = []
     try {
       modList.value = await get_mod_list(settingStore.mod.path)
+      console.log(modList.value)
       modList.value.sort((next, pre) => {
         if (next.enabled && !pre.enabled) {
           return -1
