@@ -6,11 +6,12 @@
       width="9rem"
       :collapsed-width="appStore.fontSize * 4"
       show-trigger="arrow-circle"
-      trigger-style="left: 5rem;opacity: 0.5;"
+      trigger-style="left: 7rem;opacity: 0.5;"
       collapsed-trigger-style="left: 0rem;opacity: 0.5;"
       class="h-screen"
     >
-      <layout-menu />
+      <layout-menu class="h-90%" />
+      <language class="h-10%" />
     </n-layout-sider>
     <n-layout-content>
       <layout-main />
@@ -20,7 +21,7 @@
 
 <script setup lang="ts">
   import { useAppStore } from '@/stores'
-  import { LayoutMain, LayoutMenu } from './components'
+  import { LayoutMain, LayoutMenu, Language } from './components'
 
   const appStore = useAppStore()
 </script>
