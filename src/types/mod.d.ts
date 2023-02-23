@@ -17,14 +17,11 @@ interface ModMetadata {
   like: boolean
 }
 
-interface ModInfo extends ModMetadata {
+interface ModInfo {
   id: string
-  parentId: string
+  parent_id: string
   path: string
   localImages: string[]
-}
-
-interface ModParse extends ModInfo {
-  iniName: string
   isMerged: boolean
+  metadata: ModMetadata
 }

@@ -67,6 +67,7 @@
       //   return 0
       // })
     } catch (e) {
+      console.log(e)
       window.$message?.warning(t('not found mod path'))
     }
   }

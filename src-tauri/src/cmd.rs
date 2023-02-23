@@ -4,6 +4,7 @@ use std::path::Path;
 
 use self::file::ModInfo;
 
+pub mod categories;
 pub mod file;
 
 type CmdResult<T = ()> = Result<T, String>;

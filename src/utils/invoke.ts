@@ -1,7 +1,6 @@
 import type { OpenDialogOptions } from '@tauri-apps/api/dialog'
 import { shell, dialog } from '@tauri-apps/api'
-import { invoke, convertFileSrc } from '@tauri-apps/api/tauri'
-import { getCategories } from '@/views/mod/handle'
+import { invoke } from '@tauri-apps/api/tauri'
 
 export function select_dir<T extends OpenDialogOptions = OpenDialogOptions>(options?: T) {
   const { directory = true, multiple = false } = options || {}
@@ -17,12 +16,7 @@ export const open_dir = (path: string) => shell.open(path)
 
 export async function get_mod_list(path?: string): Promise<ModInfo[]> {
   if (!path) return []
-  const modInfoList = await invoke<ModParse[]>('get_mod_list', { path })
-  return modInfoList.map(({ isMerged, iniName, path, categories, ...other }) => ({
-    ...other,
-    categories: !isMerged && categories.length === 0 ? getCategories(iniName) : categories,
-    path: path.replace(/\\/g, '/'),
-  }))
+  return invoke<ModInfo[]>('get_mod_list', { path })
 }
 
 export const rename = (path: string, newPath: string) => invoke('rename', { path, newPath })

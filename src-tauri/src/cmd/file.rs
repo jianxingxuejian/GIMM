@@ -6,12 +6,24 @@ use std::fs::File;
 use std::io;
 use std::io::{Read, Write};
 use std::path::Path;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use walkdir::WalkDir;
 
+use super::categories::get_categories;
 use super::MyError;
 
 #[derive(Serialize, Deserialize)]
 pub struct ModInfo {
+    id: usize,
+    parent_id: Option<usize>,
+    path: String,
+    metadata: ModMetadata,
+    local_images: Vec<String>,
+    is_merged: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ModMetadata {
     info: Info,
     author: Author,
     categories: Vec<String>,
@@ -39,8 +51,18 @@ pub fn get_mod_list(path: String) -> Vec<ModInfo> {
     let path = Path::new(&path);
     let ini = Some(OsStr::new("ini"));
     let merged = Some(OsStr::new("merged.ini"));
-    // Iterate the ini file in the mods folder
-    let mut iter = WalkDir::new(path).into_iter();
+    // Iterate the ini file in the mods folder, and sort the merged.ini file to the front
+    let mut iter = WalkDir::new(path)
+        .sort_by(|a, b| {
+            if a.file_name() == "merged.ini" {
+                std::cmp::Ordering::Less
+            } else if b.file_name() == "merged.ini" {
+                std::cmp::Ordering::Greater
+            } else {
+                a.file_name().cmp(b.file_name())
+            }
+        })
+        .into_iter();
     while let Some(entry) = iter.next() {
         let entry = match entry {
             Ok(entry) => entry,
@@ -66,6 +88,12 @@ pub fn get_mod_list(path: String) -> Vec<ModInfo> {
     mod_list
 }
 
+static COUNTER: AtomicUsize = AtomicUsize::new(0);
+
+fn generate_id() -> usize {
+    COUNTER.fetch_add(1, Ordering::SeqCst)
+}
+
 fn handle_merge(path: &Path) -> Vec<ModInfo> {
     let mut mod_list = Vec::new();
     let walker = WalkDir::new(path);
@@ -74,20 +102,32 @@ fn handle_merge(path: &Path) -> Vec<ModInfo> {
 }
 
 fn get_or_create_info(path: &Path) -> Option<ModInfo> {
-    let modinfo = path.with_file_name("modinfo.json");
-    let contents = if modinfo.exists() {
-        let mut file = File::open(&modinfo).ok()?;
+    let metadata_path = path.with_file_name("modinfo.json");
+    let contents = if metadata_path.exists() {
+        let mut file = File::open(&metadata_path).ok()?;
         let mut json_string = String::new();
         file.read_to_string(&mut json_string).ok()?;
         json_string
     } else {
         let json_string = include_str!("modinfo.json");
-        let mut file = File::create(&modinfo).ok()?;
+        let mut file = File::create(&metadata_path).ok()?;
         file.write(json_string.as_bytes()).ok();
         json_string.to_string()
     };
-    let mod_info: ModInfo = serde_json::from_str(&contents).ok()?;
-    Some(mod_info)
+    let mut metadata: ModMetadata = serde_json::from_str(&contents).ok()?;
+    if metadata.categories.len() == 0 {
+        let ini_name = path.file_stem().unwrap().to_string_lossy().to_string();
+        metadata.categories = get_categories(&ini_name);
+    }
+    let mod_parse = ModInfo {
+        id: generate_id(),
+        parent_id: None,
+        path: metadata_path.display().to_string().replace("\\", "/"),
+        metadata,
+        local_images: Vec::new(),
+        is_merged: false,
+    };
+    Some(mod_parse)
 }
 
 fn is_deep_merge(path: &Path, ini: Option<&OsStr>) -> Option<bool> {

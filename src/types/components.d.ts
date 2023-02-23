@@ -14,7 +14,6 @@ declare module '@vue/runtime-core' {
     IconIonLanguage: typeof import('~icons/ion/language')['default']
     NaiveProvider: typeof import('./../components/NaiveProvider.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
-    NCascader: typeof import('naive-ui')['NCascader']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
     NDialogProvider: typeof import('naive-ui')['NDialogProvider']
     NInput: typeof import('naive-ui')['NInput']
