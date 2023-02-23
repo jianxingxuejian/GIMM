@@ -1,7 +1,7 @@
 import type { OpenDialogOptions } from '@tauri-apps/api/dialog'
 import { shell, dialog } from '@tauri-apps/api'
 import { invoke, convertFileSrc } from '@tauri-apps/api/tauri'
-import { CharacterEnum } from '@/views/mod/constant'
+import { getCategories } from '@/views/mod/handle'
 
 export function select_dir<T extends OpenDialogOptions = OpenDialogOptions>(options?: T) {
   const { directory = true, multiple = false } = options || {}
@@ -15,60 +15,28 @@ export const select_file = <T extends OpenDialogOptions = OpenDialogOptions>(opt
 
 export const open_dir = (path: string) => shell.open(path)
 
-type ModListResult = Record<string, { contents: string; name: string; local_img: string[] }>
-
-export async function get_mod_list(path?: string): Promise<Mod[]> {
+export async function get_mod_list(path?: string): Promise<ModInfo[]> {
   if (!path) return []
-  const result = await invoke<ModListResult>('get_mod_list', { path })
-  return Object.entries(result).map(([path, modinfo]) => {
-    const { contents, name, local_img } = modinfo
-    const { images, ...other }: ModBasic = convertModBasic(contents, name)
-    const enabled = !path.includes('DISABLED_')
-    let src = images[0]
-    if (!src && local_img.length > 0) {
-      src = convertFileSrc(local_img[0])
-    }
-    return {
-      path: path.replace(/\\/g, '/'),
-      src,
-      enabled,
-      images,
-      ...other,
-      iniName: name,
-    }
-  })
-}
-
-function convertModBasic(contents: string, name: string) {
-  const basic: ModBasic = JSON.parse(contents)
-  const { modId } = basic
-  if (!modId) {
-    Object.entries(CharacterEnum).forEach(([k]) => {
-      if (name.toLocaleLowerCase().includes(k)) {
-        basic.name = k
-        basic.type = 1
-        return false
-      }
-    })
-  }
-  if (!basic.type) {
-    basic.type = 10
-  }
-  return basic
+  const modInfoList = await invoke<ModParse[]>('get_mod_list', { path })
+  return modInfoList.map(({ isMerged, iniName, path, categories, ...other }) => ({
+    ...other,
+    categories: !isMerged && categories.length === 0 ? getCategories(iniName) : categories,
+    path: path.replace(/\\/g, '/'),
+  }))
 }
 
 export const rename = (path: string, newPath: string) => invoke('rename', { path, newPath })
 
-export function write_file(mod: Mod) {
-  const { path, id, name, images, submitter, type, modId } = mod
-  const contents = JSON.stringify({ id, name, images, submitter, type, modId })
-  return invoke('write_file', { path: path + '/modinfo.json', contents })
+export function write_file(mod: ModMetadata) {
+  // const { path, id, name, images, submitter, type, modId } = mod
+  // const contents = JSON.stringify({ id, name, images, submitter, type, modId })
+  // return invoke('write_file', { path: path + '/modinfo.json', contents })
 }
 
-export function download(url: string, path: string, mod: ModBasic) {
-  const { id, name, images, submitter } = mod
-  const contents = JSON.stringify({ id, name, images, submitter })
-  return invoke('download', { url, path, contents })
+export function download(url: string, path: string, mod: ModMetadata) {
+  // const { id, name, images, submitter } = mod
+  // const contents = JSON.stringify({ id, name, images, submitter })
+  // return invoke('download', { url, path, contents })
 }
 
 export const installCA = () => invoke<string>('install_ca')

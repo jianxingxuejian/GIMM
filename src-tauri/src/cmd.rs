@@ -1,6 +1,6 @@
 use std::error::Error;
+use std::fmt;
 use std::path::Path;
-use std::{collections::HashMap, fmt};
 
 use self::file::ModInfo;
 
@@ -36,7 +36,7 @@ pub enum MyError {
 }
 
 #[tauri::command]
-pub fn get_mod_list(path: String) -> HashMap<String, ModInfo> {
+pub fn get_mod_list(path: String) -> Vec<ModInfo> {
     return file::get_mod_list(path);
 }
 

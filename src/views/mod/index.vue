@@ -5,7 +5,7 @@
         <enhanced-button @click="settingRef?.show">
           <icon-ic-outline-settings />
         </enhanced-button>
-        <n-cascader
+        <!-- <n-cascader
           :options="options"
           multiple
           clearable
@@ -14,7 +14,7 @@
           check-strategy="parent"
           max-tag-count="responsive"
           class="w-50"
-        />
+        /> -->
       </n-space>
     </div>
     <div
@@ -28,41 +28,44 @@
 
 <script setup lang="ts">
   import { useI18n } from 'vue-i18n'
-  import { uniq } from 'lodash-es'
+  // import { uniq } from 'lodash-es'
   import { useSettingStore } from '@/stores'
   import { get_mod_list } from '@/utils'
   import { SettingModal } from './components'
+  import { getCategories } from './handle'
+
+  console.log(getCategories('AlbedoMod'))
 
   const { t } = useI18n()
   const settingStore = useSettingStore()
 
   const settingRef = ref<InstanceType<typeof SettingModal>>()
 
-  const modList = ref<Mod[]>([])
-  const options = computed(() => [
-    {
-      value: 'character',
-      label: t('characters'),
-      children: uniq(modList.value.map(item => item.name)).map(item => ({
-        value: item,
-        label: t(item!),
-      })),
-    },
-  ])
+  const modList = ref<ModInfo[]>([])
+  // const options = computed(() => [
+  //   {
+  //     value: 'character',
+  //     label: t('characters'),
+  //     children: uniq(modList.value.map(item => item.name)).map(item => ({
+  //       value: item,
+  //       label: t(item!),
+  //     })),
+  //   },
+  // ])
 
   const loadModList = async () => {
     modList.value = []
     try {
       modList.value = await get_mod_list(settingStore.mod.path)
       console.log(modList.value)
-      modList.value.sort((next, pre) => {
-        if (next.enabled && !pre.enabled) {
-          return -1
-        } else if (next.enabled == pre.enabled) {
-          return next.name.localeCompare(pre.name, settingStore.locale)
-        }
-        return 0
-      })
+      // modList.value.sort((next, pre) => {
+      //   if (next.enabled && !pre.enabled) {
+      //     return -1
+      //   } else if (next.enabled == pre.enabled) {
+      //     return next.name.localeCompare(pre.name, settingStore.locale)
+      //   }
+      //   return 0
+      // })
     } catch (e) {
       window.$message?.warning(t('not found mod path'))
     }
