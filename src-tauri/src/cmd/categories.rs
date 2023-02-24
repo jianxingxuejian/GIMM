@@ -1,24 +1,50 @@
+mod constant;
+use constant::{
+    CHARACTER_MAP, ENEMY_MAP, ENTITIES_MAP, NPC_MAP, OBJECT_MAP, TCGCARD_MAP, WEAPON_MAP,
+};
 use tauri::utils::assets::phf;
 
-const CHARACTER_MAP: phf::Map<&'static str, &'static str> = phf::phf_map! {
-  "AlbedoMod"=> "albedo",
+struct Mapping {
+    map: &'static phf::Map<&'static str, &'static str>,
+    category: &'static str,
+}
 
-
-};
-const NPC_MAP: phf::Map<&'static str, &'static str> = phf::phf_map! {
-  "AlbedoMod" => "albedo",
-  "AloyMod" => "aloy",
-  "AmberMod" => "amber",
-};
+const MAPPINGS: [Mapping; 7] = [
+    Mapping {
+        map: &CHARACTER_MAP,
+        category: "character",
+    },
+    Mapping {
+        map: &NPC_MAP,
+        category: "npc",
+    },
+    Mapping {
+        map: &ENEMY_MAP,
+        category: "enemy",
+    },
+    Mapping {
+        map: &OBJECT_MAP,
+        category: "object",
+    },
+    Mapping {
+        map: &TCGCARD_MAP,
+        category: "tcgcard",
+    },
+    Mapping {
+        map: &WEAPON_MAP,
+        category: "weapon",
+    },
+    Mapping {
+        map: &ENTITIES_MAP,
+        category: "entities",
+    },
+];
 
 pub fn get_categories(s: &str) -> Vec<String> {
-    let value = CHARACTER_MAP.get(s);
-    if let Some(value) = value {
-        return vec![value.to_string()];
+    for mapping in MAPPINGS.iter() {
+        if let Some(value) = mapping.map.get(s) {
+            return vec![mapping.category.into(), value.to_string()];
+        }
     }
-    let value = NPC_MAP.get(s);
-    if let Some(value) = value {
-        return vec![value.to_string()];
-    }
-    return vec!["other".to_string()];
+    return vec!["other".into(), s.into()];
 }

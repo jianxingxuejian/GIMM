@@ -32,9 +32,6 @@
   import { useSettingStore } from '@/stores'
   import { get_mod_list } from '@/utils'
   import { SettingModal } from './components'
-  import { getCategories } from './handle'
-
-  console.log(getCategories('AlbedoMod'))
 
   const { t } = useI18n()
   const settingStore = useSettingStore()
