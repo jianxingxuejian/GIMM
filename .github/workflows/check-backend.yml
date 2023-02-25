@@ -23,6 +23,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+          profile: minimal
 
       - name: Format check
         run: cd src-tauri && cargo fmt -- --check
