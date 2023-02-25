@@ -19,9 +19,13 @@ interface ModMetadata {
 
 interface ModInfo {
   id: string
-  parent_id: string
-  path: string
-  localImages: string[]
-  isMerged: boolean
+  parentId: string
+  metadataPath: string
+  iniPath: string
   metadata: ModMetadata
+  localImages: string[]
+  is_disabled: boolean
+  isMerged: boolean
+  children: string[]
+  deepChildren: ModInfo[]
 }
