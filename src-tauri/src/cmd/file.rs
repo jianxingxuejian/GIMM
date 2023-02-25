@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::OsStr;
 use std::fs;
 use std::fs::File;
 use std::io;
-use std::io::{Read, Write};
-use std::path::Path;
+use std::io::Write;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use walkdir::WalkDir;
 
@@ -13,13 +14,18 @@ use super::categories::get_categories;
 use super::MyError;
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ModInfo {
     id: usize,
     parent_id: Option<usize>,
-    path: String,
+    metadata_path: String,
+    ini_path: String,
     metadata: ModMetadata,
     local_images: Vec<String>,
+    is_disabled: bool,
     is_merged: bool,
+    children: Vec<String>,
+    deep_children: Vec<ModInfo>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -51,6 +57,7 @@ pub fn get_mod_list(path: String) -> Vec<ModInfo> {
     let path = Path::new(&path);
     let ini = Some(OsStr::new("ini"));
     let merged = Some(OsStr::new("merged.ini"));
+
     // Iterate the ini file in the mods folder, and sort the merged.ini file to the front
     let mut iter = WalkDir::new(path)
         .sort_by(|a, b| {
@@ -63,6 +70,7 @@ pub fn get_mod_list(path: String) -> Vec<ModInfo> {
             }
         })
         .into_iter();
+
     while let Some(entry) = iter.next() {
         let entry = match entry {
             Ok(entry) => entry,
@@ -72,16 +80,16 @@ pub fn get_mod_list(path: String) -> Vec<ModInfo> {
         if path.extension() != ini {
             continue;
         }
-        // when the ini file is merged.ini, skip current dir
+        // when the ini file is merged.ini, skip current dir, then handle merge logic
         if path.file_name() == merged {
             iter.skip_current_dir();
-            if let Some(parent) = path.parent() {
-                mod_list.extend(handle_merge(parent));
+            if let Some(merge_mod) = handle_merge(path, ini, merged) {
+                mod_list.push(merge_mod);
             }
             continue;
         }
-        // when the ini file is not merged.ini, get the modinfo.json
-        if let Some(mod_info) = get_or_create_info(path) {
+        // when the ini file is not merged.ini, get the mod info
+        if let Some(mod_info) = get_mod_info(path, false) {
             mod_list.push(mod_info);
         }
     }
@@ -94,58 +102,117 @@ fn generate_id() -> usize {
     COUNTER.fetch_add(1, Ordering::SeqCst)
 }
 
-fn handle_merge(path: &Path) -> Vec<ModInfo> {
-    let mut mod_list = Vec::new();
-    let walker = WalkDir::new(path);
-    // todo
-    return mod_list;
-}
+fn handle_merge(ini_path: &Path, ini: Option<&OsStr>, merged: Option<&OsStr>) -> Option<ModInfo> {
+    let mut merged_info = get_mod_info(&ini_path, true)?;
+    let mut deep_map: HashMap<PathBuf, ModInfo> = HashMap::new();
+    let dir_path = ini_path.parent()?;
 
-fn get_or_create_info(path: &Path) -> Option<ModInfo> {
-    let metadata_path = path.with_file_name("modinfo.json");
-    let contents = if metadata_path.exists() {
-        let mut file = File::open(&metadata_path).ok()?;
-        let mut json_string = String::new();
-        file.read_to_string(&mut json_string).ok()?;
-        json_string
-    } else {
-        let json_string = include_str!("modinfo.json");
-        let mut file = File::create(&metadata_path).ok()?;
-        file.write(json_string.as_bytes()).ok();
-        json_string.to_string()
-    };
-    let mut metadata: ModMetadata = serde_json::from_str(&contents).ok()?;
-    if metadata.categories.len() == 0 {
-        let ini_name = path.file_stem().unwrap().to_string_lossy().to_string();
-        metadata.categories = get_categories(&ini_name);
-    }
-    let mod_parse = ModInfo {
-        id: generate_id(),
-        parent_id: None,
-        path: metadata_path.display().to_string().replace("\\", "/"),
-        metadata,
-        local_images: Vec::new(),
-        is_merged: false,
-    };
-    Some(mod_parse)
-}
-
-fn is_deep_merge(path: &Path, ini: Option<&OsStr>) -> Option<bool> {
-    let entries = fs::read_dir(path).ok()?;
-    for entry in entries {
-        let path = entry.ok()?.path();
-        if !path.is_dir() {
+    for ini_path in WalkDir::new(dir_path)
+        .into_iter()
+        .filter_map(Result::ok)
+        .filter(|e| {
+            e.file_type().is_file() && e.path().extension() == ini && e.path().file_name() != merged
+        })
+        .map(|e| e.path().to_owned())
+    {
+        println!("{}", ini_path.display());
+        let dir_path = ini_path.parent()?;
+        let parent_path = dir_path.parent()?;
+        // for 1 level ini, just push the path to children
+        if parent_path.join("merged.ini").exists() {
+            merged_info.children.push(ini_path.display().to_string());
             continue;
         }
 
-        let entries = fs::read_dir(path).ok()?;
-        for entry in entries {
-            if entry.ok()?.path().extension() == ini {
-                return Some(false);
-            }
+        // for 2 and more level ini, get the modinfo.json and push to deep_children
+        if let Some(mod_info) = deep_map.get_mut(parent_path) {
+            mod_info.children.push(ini_path.display().to_string());
+            continue;
+        }
+        if let Some(mut mod_info) = get_mod_info(&ini_path, false) {
+            mod_info.parent_id = Some(merged_info.id);
+            deep_map.insert(parent_path.to_path_buf(), mod_info);
         }
     }
-    return Some(true);
+
+    merged_info.deep_children = deep_map.into_iter().map(|(_, v)| v).collect();
+    Some(merged_info)
+}
+
+fn get_mod_info(ini_path: &Path, is_merged: bool) -> Option<ModInfo> {
+    // get a modinfo.json from current path or parent path
+    let dir_path = ini_path.parent()?;
+    let metadata_path = if is_merged {
+        ini_path.with_file_name("modinfo.json")
+    } else {
+        let parent_metadata_path = dir_path.parent()?.join("modinfo.json");
+        if parent_metadata_path.exists() {
+            parent_metadata_path
+        } else {
+            ini_path.with_file_name("modinfo.json")
+        }
+    };
+
+    let mut metadata: ModMetadata = get_or_create_metadata(&metadata_path)?;
+    let local_images = get_local_img(&metadata_path.parent()?);
+    let metadata_path = metadata_path.display().to_string();
+    let ini_path_str = ini_path.display().to_string();
+    let is_disabled = ini_path_str.to_lowercase().contains("disabled");
+
+    // if categories is empty, get categories from ini file name
+    if metadata.categories.is_empty() {
+        let ini_name = ini_path
+            .file_stem()?
+            .to_string_lossy()
+            .replace("disabled", "")
+            .replace("DISABLED", "");
+        metadata.categories = get_categories(&ini_name);
+    }
+
+    Some(ModInfo {
+        id: generate_id(),
+        parent_id: None,
+        metadata_path,
+        ini_path: ini_path_str,
+        metadata,
+        local_images,
+        is_disabled,
+        is_merged,
+        children: Vec::new(),
+        deep_children: Vec::new(),
+    })
+}
+
+fn get_or_create_metadata(path: &Path) -> Option<ModMetadata> {
+    let contents = fs::read_to_string(path).ok().or_else(|| {
+        // if modinfo.json not exist, create it
+        let json_string = include_str!("modinfo.json");
+        let mut file = File::create(path).ok()?;
+        file.write_all(json_string.as_bytes()).ok()?;
+        Some(json_string.to_owned())
+    })?;
+    let metadata: ModMetadata = serde_json::from_str(&contents).ok()?;
+    Some(metadata)
+}
+
+const EXTS: &[&str] = &["png", "jpg", "jpeg", "jfif", "webp"];
+
+fn get_local_img(path: &Path) -> Vec<String> {
+    fs::read_dir(path)
+        .map(|dir| {
+            dir.filter_map(Result::ok)
+                .filter_map(|entry| {
+                    entry.path().extension().and_then(|extension| {
+                        extension
+                            .to_str()
+                            .filter(|ext| EXTS.contains(&ext))
+                            .map(|_| entry.path().display().to_string())
+                    })
+                })
+                .filter(|path| !path.ends_with("ShadowRamp.jpg"))
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 pub fn rename(path: String, new_path: String) -> Result<(), Box<dyn Error>> {
@@ -159,27 +226,6 @@ pub fn write_file(path: String, contents: String) -> Result<(), Box<dyn Error>> 
     let mut file = File::create(path)?;
     file.write_all(contents.as_bytes())?;
     Ok(())
-}
-
-const EXTS: &'static [&'static str] = &["png", "jpg", "jpeg", "jfif"];
-
-fn read_local_img(path: &Path) -> Result<Vec<String>, Box<dyn Error>> {
-    let mut local_img = Vec::new();
-    let dir = fs::read_dir(path)?;
-    for entry in dir {
-        let path = entry?.path();
-        if !path.is_file() {
-            continue;
-        }
-        let extension = path
-            .extension()
-            .and_then(OsStr::to_str)
-            .ok_or(MyError::IOError)?;
-        if EXTS.contains(&extension) {
-            local_img.push(path.display().to_string());
-        }
-    }
-    Ok(local_img)
 }
 
 pub fn unzip(path: &Path) -> Result<(), Box<dyn Error>> {
