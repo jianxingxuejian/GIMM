@@ -1,49 +1,49 @@
 mod constant;
 use constant::{
-    CHARACTER_MAP, ENEMY_MAP, ENTITIES_MAP, NPC_MAP, OBJECT_MAP, TCGCARD_MAP, WEAPON_MAP,
+    CHARACTER_SET, ENEMY_SET, ENTITIES_SET, NPC_SET, OBJECT_SET, TCGCARD_SET, WEAPON_SET,
 };
 use tauri::utils::assets::phf;
 
 struct Mapping {
-    map: &'static phf::Map<&'static str, &'static str>,
+    set: &'static phf::Set<&'static str>,
     category: &'static str,
 }
 
 const MAPPINGS: [Mapping; 7] = [
     Mapping {
-        map: &CHARACTER_MAP,
-        category: "character",
+        set: &CHARACTER_SET,
+        category: "Character",
     },
     Mapping {
-        map: &NPC_MAP,
-        category: "npc",
+        set: &NPC_SET,
+        category: "NPC",
     },
     Mapping {
-        map: &ENEMY_MAP,
-        category: "enemy",
+        set: &ENEMY_SET,
+        category: "Enemy",
     },
     Mapping {
-        map: &OBJECT_MAP,
-        category: "object",
+        set: &OBJECT_SET,
+        category: "Object",
     },
     Mapping {
-        map: &TCGCARD_MAP,
-        category: "tcgcard",
+        set: &TCGCARD_SET,
+        category: "TcgCard",
     },
     Mapping {
-        map: &WEAPON_MAP,
-        category: "weapon",
+        set: &WEAPON_SET,
+        category: "Weapon",
     },
     Mapping {
-        map: &ENTITIES_MAP,
-        category: "entities",
+        set: &ENTITIES_SET,
+        category: "Entities",
     },
 ];
 
 pub fn get_categories(s: &str) -> Vec<String> {
     for mapping in MAPPINGS.iter() {
-        if let Some(value) = mapping.map.get(s) {
-            return vec![mapping.category.into(), value.to_string()];
+        if mapping.set.contains(s) {
+            return vec![mapping.category.into(), s.into()];
         }
     }
     return vec!["other".into(), s.into()];
