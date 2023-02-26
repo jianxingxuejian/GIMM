@@ -195,6 +195,17 @@ fn get_or_create_metadata(path: &Path) -> Option<ModMetadata> {
     Some(metadata)
 }
 
+#[cfg(target_os = "windows")]
+const PROTOCOL: &str = "https://asset.localhost/";
+#[cfg(not(target_os = "windows"))]
+const PROTOCOL: &str = "asset://localhost/";
+
+// convert file path to asset url
+fn convert_file_src(file_path: &str) -> String {
+    let path = urlencoding::encode(file_path);
+    format!("{}{}", PROTOCOL, path)
+}
+
 const EXTS: &[&str] = &["png", "jpg", "jpeg", "jfif", "webp"];
 
 fn get_local_img(path: &Path) -> Vec<String> {
@@ -206,7 +217,7 @@ fn get_local_img(path: &Path) -> Vec<String> {
                         extension
                             .to_str()
                             .filter(|ext| EXTS.contains(&ext))
-                            .map(|_| entry.path().display().to_string())
+                            .map(|_| convert_file_src(&entry.path().display().to_string()))
                     })
                 })
                 .filter(|path| !path.ends_with("ShadowRamp.jpg"))
