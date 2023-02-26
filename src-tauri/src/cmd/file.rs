@@ -28,27 +28,38 @@ pub struct ModInfo {
     deep_children: Vec<ModInfo>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct ModMetadata {
+    #[serde(default)]
     info: Info,
+    #[serde(default)]
     author: Author,
+    #[serde(default)]
     categories: Vec<String>,
+    #[serde(default)]
     tags: Vec<String>,
+    #[serde(default)]
     order: Option<u16>,
+    #[serde(default)]
     like: bool,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct Info {
     name: String,
+    #[serde(default)]
     urls: Vec<String>,
+    #[serde(default)]
     images: Vec<String>,
+    #[serde(default)]
     videos: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct Author {
+    #[serde(default)]
     name: String,
+    #[serde(default)]
     urls: Vec<String>,
 }
 
@@ -115,7 +126,6 @@ fn handle_merge(ini_path: &Path, ini: Option<&OsStr>, merged: Option<&OsStr>) ->
         })
         .map(|e| e.path().to_owned())
     {
-        println!("{}", ini_path.display());
         let dir_path = ini_path.parent()?;
         let parent_path = dir_path.parent()?;
         // for 1 level ini, just push the path to children
