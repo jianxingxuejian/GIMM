@@ -4,7 +4,7 @@
     preset="card"
     :title="t('mod settings')"
     :auto-focus="false"
-    class="w-80%"
+    class="w-70%"
   >
     <div class="flex-col items-center gap-y-5">
       <select-file
@@ -13,6 +13,11 @@
         :placeholder="t('select mod dir')"
         @click="handleSelectPath"
       />
+      <n-space class="items-center">
+        <span>{{ t('img aspect ratio') }}</span>
+        <n-input-number v-model:value="mod.width" class="w-30 text-center" />
+        <n-input-number v-model:value="mod.height" class="w-30 text-center" />
+      </n-space>
       <n-button type="success" @click="updateModPath()">{{ t('save') }}</n-button>
     </div>
   </n-modal>

@@ -6,6 +6,8 @@ export const useSettingStore = defineStore('setting-store', {
     locale: 'en',
     mod: {
       path: '',
+      width: 9,
+      height: 16,
     },
   }),
   actions: {

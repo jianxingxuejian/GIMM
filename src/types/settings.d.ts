@@ -5,6 +5,8 @@ interface Setting {
 
 interface ModSettings {
   path: string
+  width: number
+  height: number
 }
 
 type LocaleCode = 'en' | 'zh-CN'
