@@ -28,7 +28,7 @@ const MAPPINGS: [Mapping; 7] = [
     },
     Mapping {
         set: &TCGCARD_SET,
-        category: "TcgCard",
+        category: "TCG_Card",
     },
     Mapping {
         set: &WEAPON_SET,
