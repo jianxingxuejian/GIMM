@@ -56,6 +56,10 @@
       closeIconSize: '1.5rem',
       closeSize: '1.75rem',
     },
+    Checkbox: {
+      sizeMedium: '0.875rem',
+      fontSizeMedium: '1rem',
+    },
     Menu: {
       fontSize: '1.25rem',
       itemHeight: '4rem',

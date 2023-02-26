@@ -1,3 +1,23 @@
 .n-card-header {
   text-align: center;
 }
+
+.n-tree {
+  .n-tree-node-wrapper {
+    padding: 0.2rem 0;
+  }
+  .n-tree-node-switcher {
+    height: 1.5rem;
+    width: 1.5rem;
+    .n-tree-node-switcher__icon {
+      height: 1rem;
+      width: 1rem;
+      font-size: 1rem;
+    }
+  }
+  .n-tree-node-checkbox {
+    height: 1.5rem;
+    width: 1rem;
+    margin-right: 0.25rem;
+  }
+}

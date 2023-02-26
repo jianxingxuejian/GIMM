@@ -4,7 +4,17 @@
     "mod": "Mod",
     "tools": "Utils"
   },
-  "character": {
+  "common": {
+    "character": "Character",
+    "NPC": "NPC",
+    "enemy": "Enemy",
+    "object": "Object",
+    "TCG_card": "TCG Card",
+    "weapon": "Weapon",
+    "entities": "Entities",
+    "other": "Other"
+  },
+  "Character": {
     "mona": "Mona",
     "zhongli": "Zhongli",
     "collei": "Collei",

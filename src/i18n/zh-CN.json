@@ -4,7 +4,17 @@
     "mod": "Mod",
     "tools": "工具"
   },
-  "character": {
+  "common": {
+    "character": "角色",
+    "NPC": "NPC",
+    "enemy": "敌人",
+    "object": "物体",
+    "TCG_card": "TCG卡牌",
+    "weapon": "武器",
+    "entities": "实体",
+    "other": "其他"
+  },
+  "Character": {
     "mona": "莫娜",
     "zhongli": "钟离",
     "collei": "柯莱",

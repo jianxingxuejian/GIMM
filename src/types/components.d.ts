@@ -31,6 +31,7 @@ declare module '@vue/runtime-core' {
     NPopselect: typeof import('naive-ui')['NPopselect']
     NSpace: typeof import('naive-ui')['NSpace']
     NTooltip: typeof import('naive-ui')['NTooltip']
+    NTree: typeof import('naive-ui')['NTree']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SelectFile: typeof import('./../components/SelectFile.vue')['default']

@@ -30,7 +30,7 @@
       width: 2rem;
       height: 2rem;
       font-size: 1.5rem;
-      right: 10%;
+      right: 20%;
       opacity: 0.5;
     }
   }
