@@ -12,6 +12,6 @@ export default defineConfig({
     'flex-end': 'flex justify-end items-center',
     'flex-between': 'flex justify-between items-center',
     'flex-evenly': 'flex justify-evenly items-center',
-    'flex-around': 'flex justify-around items-center'
-  }
+    'flex-around': 'flex justify-around items-center',
+  },
 })
