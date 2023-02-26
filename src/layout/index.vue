@@ -6,8 +6,6 @@
       width="9rem"
       :collapsed-width="appStore.fontSize * 4"
       show-trigger="arrow-circle"
-      trigger-style="left: 7rem;opacity: 0.5;"
-      collapsed-trigger-style="left: 0rem;opacity: 0.5;"
       class="h-screen"
     >
       <layout-menu class="h-90%" />
@@ -25,3 +23,15 @@
 
   const appStore = useAppStore()
 </script>
+
+<style lang="scss" scoped>
+  :deep(.n-layout-sider) {
+    .n-layout-toggle-button {
+      width: 2rem;
+      height: 2rem;
+      font-size: 1.5rem;
+      right: 10%;
+      opacity: 0.5;
+    }
+  }
+</style>
