@@ -25,13 +25,15 @@ Recommend using Visual Studio Code for development and installing recommended pl
 Install dependencies:
 
 ```shell
+// before install dependencies, you need to install pnpm, use npm -g install pnpm
 pnpm install
 ```
 
-Run：
+Run and build：
 
 ```shell
 pnpm tauri dev
+pnpm tauri build or pnpm tauri build --debug
 ```
 
 Please go to the [Tauri](https://github.com/tauri-apps/tauri) project for more information.

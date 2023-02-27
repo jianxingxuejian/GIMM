@@ -25,13 +25,15 @@
 安装依赖：
 
 ```shell
+// 安装依赖之前需要全局安装pnpm，使用npm -g install pnpm进行安装
 pnpm install
 ```
 
-启动：
+启动和打包：
 
 ```shell
 pnpm tauri dev
+pnpm tauri build or pnpm tauri build --debug
 ```
 
 更详细的内容请前往 [Tauri](https://github.com/tauri-apps/tauri) 项目进行了解。
