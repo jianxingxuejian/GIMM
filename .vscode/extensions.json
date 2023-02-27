@@ -7,6 +7,8 @@
     "esbenp.prettier-vscode",
     "EditorConfig.EditorConfig",
     "Vue.vscode-typescript-vue-plugin",
-    "antfu.unocss"
+    "antfu.unocss",
+    "antfu.iconify",
+    "lokalise.i18n-ally"
   ]
 }
