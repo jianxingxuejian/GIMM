@@ -9,7 +9,7 @@ GIMM is a mod manager for an anime game, designed to conveniently manage all loc
 ## Download
 
 Please go [here](https://github.com/jianxingxuejian/GIMM/releases) to download the latest version.
-Alternatively,you can click on the latest `build` workflow in [Action](<(https://github.com/jianxingxuejian/GIMM/actions)>), and at the bottom of the page, you can obtain the zip file that contains the latest files compiled for every commit or pull request before the release.
+Alternatively,you can click on the latest `build` workflow in [Action](https://github.com/jianxingxuejian/GIMM/actions), and at the bottom of the page, you can obtain the zip file that contains the latest files compiled for every commit or pull request before the release.
 
 ## Contribution
 
