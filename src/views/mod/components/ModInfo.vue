@@ -1,10 +1,26 @@
 <template>
-  <div class="h-50% w-full bg-red">123</div>
+  <n-drawer
+    :show="show"
+    placement="bottom"
+    :trap-focus="false"
+    :block-scroll="false"
+    :to="to"
+    height="50vh"
+    @mask-click="show = false"
+  >
+    <div></div>
+  </n-drawer>
 </template>
 
 <script setup lang="ts">
-  defineProps<{
-    show: boolean
-    mod?: ModInfo
-  }>()
+  defineProps<{ to: string }>()
+  defineExpose({ open })
+
+  const modInfo = ref<ModInfo>()
+  const show = ref(false)
+
+  function open(mod: ModInfo) {
+    modInfo.value = mod
+    show.value = true
+  }
 </script>

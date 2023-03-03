@@ -10,22 +10,25 @@
       </div>
       <n-tree :data="treeData" checkable expand-on-click selectable check-strategy="parent" />
     </div>
-    <div
-      class="grow my-2 gap-2 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8"
-    >
+    <div id="mod-list" class="grow my-2 mr-2">
       <div
-        v-for="item in modShowList"
-        :key="item.id"
-        class="flex-col items-center"
-        :style="{ aspectRatio: `${mod.width}/${mod.height}` }"
+        class="grid gap-2 grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8"
       >
         <div
-          class="w-full grow bg-center bg-no-repeat bg-contain border-slate-400 border-1 cursor-pointer"
-          :style="{ backgroundImage: `url(${item.localImages[0]})` }"
-        ></div>
+          v-for="item in modShowList"
+          :key="item.id"
+          class="flex-col items-center"
+          :style="{ aspectRatio: `${mod.width}/${mod.height}` }"
+        >
+          <div
+            class="w-full grow bg-center bg-no-repeat bg-contain border-slate-400 border-1 cursor-pointer"
+            :style="{ backgroundImage: `url(${item.localImages[0]})` }"
+            @click="modInfoRef?.open(item)"
+          ></div>
+        </div>
       </div>
+      <mod-info ref="modInfoRef" to="#mod-list" />
     </div>
-    <!-- <mod-info ref="modInfoRef" :show="showInfo" :mod="currentMod" /> -->
   </div>
 </template>
 
@@ -44,8 +47,6 @@
 
   const modList = ref<ModInfo[]>([])
   const modShowList = computed(() => modList.value)
-  const showInfo = ref(true)
-  const currentMod = ref<ModInfo>()
 
   const treeData = computed(() => [
     {
