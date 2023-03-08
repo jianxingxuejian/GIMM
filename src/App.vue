@@ -77,7 +77,3 @@
 
   onMounted(() => resizeFontSize())
 </script>
-
-<style lang="scss">
-  @import '@/styles/scss/naive-ui.scss';
-</style>
