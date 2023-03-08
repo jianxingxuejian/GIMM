@@ -9,6 +9,7 @@
     "Vue.vscode-typescript-vue-plugin",
     "antfu.unocss",
     "antfu.iconify",
-    "lokalise.i18n-ally"
+    "lokalise.i18n-ally",
+    "antfu.goto-alias"
   ]
 }
