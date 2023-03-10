@@ -6,7 +6,7 @@ import { loadClientSetting } from '@/utils'
 import App from './App.vue'
 
 import 'uno.css'
-import './styles/css/index.css'
+import '@unocss/reset/tailwind-compat.css'
 
 async function setupApp() {
   const app = createApp(App)
