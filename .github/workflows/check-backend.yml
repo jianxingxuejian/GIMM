@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths:
       - 'src-tauri/**'
+      - '.github/workflows/check-backend.yml'
   pull_request:
     branches: [main]
     paths:
       - 'src-tauri/**'
+      - '.github/workflows/check-backend.yml'
 
   workflow_dispatch:
 

@@ -5,14 +5,18 @@ on:
     branches: [main]
     paths-ignore:
       - 'src-tauri/**'
+      - 'tests/**'
       - '**.md'
       - '.github/**'
+      - '!/.github/workflows/check-frontend.yml'
   pull_request:
     branches: [main]
     paths-ignore:
       - 'src-tauri/**'
+      - 'tests/**'
       - '**.md'
       - '.github/**'
+      - '!/.github/workflows/check-frontend.yml'
 
   workflow_dispatch:
 
