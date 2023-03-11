@@ -688,6 +688,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "filetime_creation"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d92d3a090e4eb905aa0c4376799d51ffe6bc184f0f8b27650a98c1f61ae466a6"
+dependencies = [
+ "cfg-if",
+ "filetime",
+ "windows-sys 0.45.0",
+]
+
+[[package]]
 name = "flate2"
 version = "1.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1416,9 +1427,9 @@ dependencies = [
 
 [[package]]
 name = "lzma-rust"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5597bd30633fa661297180caaa5c1e3e0a17c6dc25fd769f967fd8c335b36d8"
+checksum = "808dc37ccba979c213304880eadaab444bb522a5fe79acca9e90ec62377125c2"
 dependencies = [
  "byteorder",
 ]
@@ -2480,13 +2491,14 @@ dependencies = [
 
 [[package]]
 name = "sevenz-rust"
-version = "0.2.4"
+version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d69e7f071742ff533cce12ae1e15376da31b98f4605d9f8ed01fbf81629559f"
+checksum = "67e6718c2f4298ae1f67fd735619b205f37ce31cb746cc7f68a32010c3ad1f1d"
 dependencies = [
  "bit-set",
  "byteorder",
  "crc",
+ "filetime_creation",
  "js-sys",
  "lzma-rust",
  "sha2 0.9.9",
