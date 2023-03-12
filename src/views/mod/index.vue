@@ -6,9 +6,18 @@
           <icon-ic-outline-settings />
         </enhanced-button>
         <setting-modal ref="settingRef" />
-        <n-input />
+        <n-input v-model:value="keyword" />
       </div>
-      <n-tree :data="treeData" checkable expand-on-click selectable check-strategy="parent" />
+      <n-tree
+        v-model:checked-keys="checkedKeys"
+        :data="treeData"
+        checkable
+        check-on-click
+        expand-on-click
+        selectable
+        cascade
+        check-strategy="parent"
+      />
     </div>
     <div id="mod-list" class="grow my-2 mr-2">
       <div
@@ -46,7 +55,38 @@
   const modInfoRef = ref<InstanceType<typeof ModInfo>>()
 
   const modList = ref<ModInfo[]>([])
-  const modShowList = computed(() => modList.value)
+  const keyword = ref<string>()
+  const checkedKeys = ref<string[]>([])
+  const modShowList = computed(() =>
+    // modList.value
+    //   .filter(
+    //     ({ metadata: { info, author } }) =>
+    //       keyword.value?.length == 0 ||
+    //       info.name.toLocaleLowerCase().includes(keyword.value!.toLocaleLowerCase()) ||
+    //       author.name.toLocaleLowerCase().includes(keyword.value!.toLocaleLowerCase())
+    //   )
+    //   .filter(({ metadata: { categories } }) =>
+    //     categories.some(c => checkedKeys.value.includes(c))
+    //   )
+    checkedKeys.value.length === 0
+      ? !keyword.value
+        ? modList.value
+        : modList.value.filter(
+            ({ metadata: { info, author } }) =>
+              info.name.toLocaleLowerCase().includes(keyword.value!.toLocaleLowerCase()) ||
+              author.name.toLocaleLowerCase().includes(keyword.value!.toLocaleLowerCase())
+          )
+      : !keyword.value
+      ? modList.value.filter(({ metadata: { categories } }) =>
+          categories.some(c => checkedKeys.value.includes(c))
+        )
+      : modList.value.filter(
+          ({ metadata: { info, author, categories } }) =>
+            (info.name.toLocaleLowerCase().includes(keyword.value!.toLocaleLowerCase()) ||
+              author.name.toLocaleLowerCase().includes(keyword.value!.toLocaleLowerCase())) &&
+            categories.some(c => checkedKeys.value.includes(c))
+        )
+  )
 
   const treeData = computed(() => [
     {
