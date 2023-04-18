@@ -21,7 +21,7 @@ tauri-plugin-store = { git = "https://github.com/tauri-apps/plugins-workspace", 
 urlencoding = "1.0"
 zip = "0.6.4"
 unrar = "0.4.4"
-sevenz-rust = "0.2.8"
+sevenz-rust = "0.2.10"
 
 
 [features]
